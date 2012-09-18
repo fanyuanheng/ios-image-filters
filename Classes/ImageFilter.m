@@ -51,8 +51,11 @@ typedef void (*FilterBlendCallback)(UInt8 *pixelBuf, UInt8 *pixelBlendBuf, UInt3
 - (UIImage*) applyFilter:(FilterCallback)filter context:(void*)context
 {
 	CGImageRef inImage = self.CGImage;
-	CFDataRef m_DataRef = CGDataProviderCopyData(CGImageGetDataProvider(inImage));  
-	UInt8 * m_PixelBuf = (UInt8 *) CFDataGetBytePtr(m_DataRef);  
+
+    CFDataRef data = CGDataProviderCopyData(CGImageGetDataProvider(inImage));
+    CFMutableDataRef m_DataRef = CFDataCreateMutableCopy(0, 0, data);
+	UInt8 * m_PixelBuf = (UInt8 *) CFDataGetBytePtr(m_DataRef);
+
 	
 	int length = CFDataGetLength(m_DataRef);
 	
@@ -74,6 +77,7 @@ typedef void (*FilterBlendCallback)(UInt8 *pixelBuf, UInt8 *pixelBlendBuf, UInt3
 	CGContextRelease(ctx);
 	UIImage *finalImage = [UIImage imageWithCGImage:imageRef];
 	CGImageRelease(imageRef);
+	CFRelease(data);
 	CFRelease(m_DataRef);
 	return finalImage;
 	
